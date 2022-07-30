@@ -1,10 +1,14 @@
 import * as React from 'react';
+import {useRef, useState, useEffect} from 'react';
 import Avatar from '@mui/material/Avatar';
+import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
+import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -15,34 +19,95 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import FormControl from '@mui/material/FormControl';
-
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'} 
-    </Typography>
-  );
-}
+import AuthContext from '../AuthProvider';
+import CloseIcon from '@mui/icons-material/Close';
+import axios from '../api/axios';
+const LOGIN_URL = '/auth/login';
+const PROFILE_URL = '/auth/profile';
 
 const theme = createTheme();
 
 export default function SignInSide() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+  const {setAuth} = React.useContext(AuthContext);
+  const userRef = useRef();
+  const errRef = useRef();
+
+  //아이디
+  const [user, setUser] = useState('');
+  //패스워드
+  const [pwd, setPwd] = useState('');
+  //에러메세지
+  const [errMsg, setErrMsg] = useState('');
+  //로그인 성공여부
+  const [success, setSuccess] = useState(false);
+
+  //페이지 로딩시 userRef에 포커스
+  useEffect(()=> {
+    userRef.current.focus();
+  }, []);
+
+  // user/pwd에 변화가 있을 시 errMsg 리셋
+  useEffect(()=> {
+    setErrMsg('');
+  }, [user, pwd]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try{
+      //rest api 로그인 요청
+      const response = await axios.post(LOGIN_URL, 
+        JSON.stringify({
+          "email" : user, 
+          "password" : pwd
+        }), 
+        {
+          headers: { 'Content-Type' : 'application/json'},
+          // withCredentials : true
+        }
+      );
+      console.log(JSON.stringify(response?.data))
+      // 로그인 토큰
+      const accessToken = response?.data?.accessToken;
+
+      const response2 = await axios.get(PROFILE_URL, 
+        {
+          headers: { 'Authorization' : 'Bearer '+ accessToken},
+          withCredentials : true
+        }
+      );
+      const name = response2?.data.name;
+      //유저 정보 저장
+      setAuth({name, accessToken});
+      setUser('')
+      setPwd('');
+      setSuccess(true);
+
+    } catch(err) {
+
+      //response 없이 에러가 난 경우 (서버에러)
+      if (!err?.response){
+        setErrMsg('서버 점검 중 입니다. 잠시 후 다시 시도해주세요');
+      }else if (err.response?.status === 403){
+        setErrMsg('아이디와 비밀번호를 다시 확인해 주세요.');
+      }else {
+        setErrMsg('로그인에 실패하였습니다.')
+      }
+    }
+
+  }
 
   return (
+    <>
+      {success ? (
+        <section>
+          <h1>You are logged in!</h1>
+          <br />
+          <p>
+            <a href="/">Sign in</a>
+          </p>
+        </section>
+      ) : (
     <ThemeProvider theme={theme}>
       <Grid container component="main" sx={{ 
         height: '85vh', 
@@ -55,7 +120,7 @@ export default function SignInSide() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: 'url(./image.jpg)',
+            backgroundImage: 'url(./signin.png)',
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
@@ -78,9 +143,29 @@ export default function SignInSide() {
                 justifyContent: 'space-between',
                 alignItems:'center',
                 pt: '90px',
-                my : 0
+                my : 0,
+                position : 'relative'
             }}
           >
+            <Collapse in={errMsg != ""} 
+            sx={{
+              position:'absolute',
+              top: '40px'
+            }}>
+            <Alert severity="error"
+            action={
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  setErrMsg('')
+                }}
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            }
+            >{errMsg}</Alert></Collapse>
            <div style={{
                my: 8,
                mx: 4,
@@ -117,7 +202,9 @@ export default function SignInSide() {
                     fullWidth
                     id="email"
                     name="email"
-                    autoComplete="email"
+                    ref={userRef}
+                    onChange={(e)=> setUser(e.target.value)}
+                    value={user}
                     autoFocus
                     size="normal"
                     endAdornment={<InputAdornment position="end"><AlternateEmailIcon/></InputAdornment>}
@@ -131,8 +218,10 @@ export default function SignInSide() {
                     fullWidth
                     id="password"
                     name="password"
-                    autoComplete="password"
                     autoFocus
+                    ref={userRef}
+                    onChange={(e)=> setPwd(e.target.value)}
+                    value={pwd}
                     endAdornment={<InputAdornment position="end"><LockOutlinedIcon/></InputAdornment>}
                 />
             </FormControl>
@@ -196,7 +285,7 @@ export default function SignInSide() {
                 }}>
                 Don't have an account yet?
                 </Typography>
-                <Link href="#" variant="caption" underline="none"
+                <Link href="/" variant="caption" underline="none"
                 sx={{
                     fontWeight : 500
                 }}>
@@ -207,5 +296,7 @@ export default function SignInSide() {
         </Grid>
       </Grid>
     </ThemeProvider>
+    )} 
+    </>
   );
 }
