@@ -126,7 +126,7 @@ export default function SignInSide() {
             backgroundPosition: 'center',
             borderTopLeftRadius : '30px',
             borderBottomLeftRadius : '30px',
-            flexBasis: '50% !important'
+            flexBasis: '50% !important',
           }}
         />
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square sx={{
@@ -134,7 +134,8 @@ export default function SignInSide() {
               borderBottomRightRadius : '30px',
               boxShadow: 'none',
               flexBasis: '50% !important',
-              maxWidth: '50% !important'
+              maxWidth: '50% !important',
+              height : '100%'
         }}>
           <Box
             sx={{
@@ -142,7 +143,7 @@ export default function SignInSide() {
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 alignItems:'center',
-                pt: '90px',
+                pt: '70px',
                 my : 0,
                 position : 'relative'
             }}

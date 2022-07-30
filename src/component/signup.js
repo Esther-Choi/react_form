@@ -275,14 +275,15 @@ export default function SignUpSide() {
                 fullWidth
                 variant="contained"
                 size="large"
-                sx={{ mt: 4, backgroundColor:'#0066cc' }}
+                sx={{ mt: 4, backgroundColor:'#0066cc'}}
               >
                 Get Started
               </Button>
             </Box>
             </div> 
             <div style={{
-                display: 'flex'
+                display: 'flex',
+                paddingTop: '1.7rem'
             }}>
                 <Typography variant="caption" component="caption"
                 sx={{
