@@ -76,9 +76,8 @@ export default function SignInSide() {
           withCredentials : true
         }
       );
-      const name = response2?.data.name;
       //유저 정보 저장
-      setAuth({name, accessToken});
+      setAuth({accessToken});
       setUser('')
       setPwd('');
       setSuccess(true);
@@ -101,10 +100,10 @@ export default function SignInSide() {
     <>
       {success ? (
         <section>
-          <h1>You are logged in!</h1>
+          <h1>안녕하세요!</h1>
           <br />
           <p>
-            <a href="/">Sign in</a>
+            <a href="/">Sign Up</a>
           </p>
         </section>
       ) : (
@@ -145,7 +144,8 @@ export default function SignInSide() {
                 alignItems:'center',
                 pt: '70px',
                 my : 0,
-                position : 'relative'
+                position : 'relative',
+                paddingBottom : '1.7rem'
             }}
           >
             <Collapse in={errMsg != ""} 
@@ -219,7 +219,6 @@ export default function SignInSide() {
                     fullWidth
                     id="password"
                     name="password"
-                    autoFocus
                     ref={userRef}
                     onChange={(e)=> setPwd(e.target.value)}
                     value={pwd}

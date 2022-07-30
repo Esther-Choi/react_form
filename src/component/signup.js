@@ -182,7 +182,6 @@ export default function SignUpSide() {
                     fullWidth
                     id="name"
                     name="name"
-                    autoComplete="name"
                     ref={userRef}
                     onChange={(e)=> setName(e.target.value)}
                     value={name}
@@ -198,11 +197,9 @@ export default function SignUpSide() {
                     fullWidth
                     id="email"
                     name="email"
-                    autoComplete="email"
                     ref={userRef}
                     onChange={(e)=> setUser(e.target.value)}
                     value={user}
-                    autoFocus
                 />
                 <OutlinedInput
                 sx={{
@@ -216,8 +213,6 @@ export default function SignUpSide() {
                     ref={userRef}
                     onChange={(e)=> setPwd(e.target.value)}
                     value={pwd}
-                    autoComplete="password"
-                    autoFocus
                 />
                 <OutlinedInput
                 sx={{
@@ -231,8 +226,6 @@ export default function SignUpSide() {
                     ref={userRef}
                     onChange={(e)=> setMobile(e.target.value)}
                     value={mobile}
-                    autoComplete="mobile"
-                    autoFocus
                 />
             </FormControl>
             <div style={{
